@@ -12,7 +12,7 @@ import {
 import { isDarkTheme, useIsDarkTheme } from '@/features/charts/useChartColours'
 import { basemapStyleFor } from '@/features/theme/basemapStyle'
 import type { HotspotLayerData } from './hotspotLayer'
-import { extentBounds, extentOutlineGeoJSON, type Extent } from './extent'
+import { extentBounds, extentOutlineGeoJSON, fitExtentFor, type Extent } from './extent'
 import { SelectionDrawing, type DrawMode, type ShapeAction } from './selectionDrawing'
 
 export const OUTLINE_SOURCE_ID = 'region-extent'
@@ -246,6 +246,19 @@ export function MapCanvas({
     void source?.setData(selectionData(selection))
     drawingRef.current?.setShape(selection ?? null)
   }, [selection, drawingEnabled])
+
+  // Fit the view to the chosen area (or back to the region when it is cleared). The first run
+  // is skipped: the map is created already fitted to the region.
+  const selectionFitted = useRef<AreaGeometry | null | undefined>(selection)
+  useEffect(() => {
+    const map = mapRef.current
+    if (!map || selectionFitted.current === selection) return
+    selectionFitted.current = selection
+    map.fitBounds(extentBounds(fitExtentFor(selection, extentRef.current.extent)), {
+      padding: FIT_PADDING_PX,
+      animate: false,
+    })
+  }, [selection])
 
   useEffect(() => {
     const map = mapRef.current

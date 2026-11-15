@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { AppRoutes } from './AppRoutes'
+import './features/map/mapWorker'
 import { QueryProvider } from './lib/QueryProvider'
 import './styles/index.css'
 

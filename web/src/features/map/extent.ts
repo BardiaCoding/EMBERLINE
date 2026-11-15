@@ -1,4 +1,5 @@
 import type { MetaOut } from '@/lib/api'
+import { geometryBbox, type AreaGeometry } from '@/lib/areaGeometry'
 
 /**
  * Pure helpers for the map view: the region extent, its outline and the map note.
@@ -98,4 +99,26 @@ export function formatExtent(extent: Extent): string {
   const lat = `lat ${extent.south.toFixed(1)} to ${extent.north.toFixed(1)}`
   const lon = `lon ${extent.west.toFixed(1)} to ${extent.east.toFixed(1)}`
   return `${lat}, ${lon} (EPSG:4326)`
+}
+
+/** Smallest width or height (degrees) the view is fitted to, so a tiny area is not zoomed to street level. */
+export const MIN_FIT_SPAN_DEG = 0.2
+
+/**
+ * The extent the view should show: the bounding box of the selection when there is one, else
+ * the region extent. A very small box is widened around its centre to `MIN_FIT_SPAN_DEG`.
+ * Always valid (west < east, south < north), in (lon, lat) order, EPSG:4326.
+ */
+export function fitExtentFor(selection: AreaGeometry | null | undefined, region: Extent): Extent {
+  const box = selection ? geometryBbox(selection) : null
+  if (!box) return region
+  const grow = (lo: number, hi: number): [number, number] => {
+    if (hi - lo >= MIN_FIT_SPAN_DEG) return [lo, hi]
+    const mid = (lo + hi) / 2
+    return [mid - MIN_FIT_SPAN_DEG / 2, mid + MIN_FIT_SPAN_DEG / 2]
+  }
+  const [west, east] = grow(box.west, box.east)
+  const [south, north] = grow(box.south, box.north)
+  const fitted = { west, south, east, north }
+  return isValidExtent(fitted) ? fitted : region
 }

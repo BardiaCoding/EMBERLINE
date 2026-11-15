@@ -742,6 +742,11 @@ Conventions for every task:
     - `docs/methodology.md` (renderer-compatible: no tables, no Mermaid), short pointers in `README.md` and `docs/submission/summary.md` only where they describe harmonization; no pipeline code added
     - _Requirements: 26.8, 33.5_
 
+- [x] 38. Fix the map showing no hotspots
+  - [x] 38.1 Diagnose and fix the empty, over-zoomed map on the deployed site
+    - Reproduce in a real browser, fix the initial fit and the hotspot layer so detections or density cells are visible for the selected area; fit the map to the selection; add a regression test where jsdom allows
+    - _Requirements: 11.5_
+
 ### Stage 4: P2 features (all optional, only if time remains)
 
 - [ ] 30. P2 differentiators

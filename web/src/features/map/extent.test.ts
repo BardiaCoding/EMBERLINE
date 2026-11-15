@@ -1,8 +1,10 @@
 import fc from 'fast-check'
+import { bboxToGeometry } from '@/lib/areaGeometry'
 import {
   CELL_SELECTION_NOTE,
   DEFAULT_REGION_EXTENT,
   extentBounds,
+  fitExtentFor,
   extentFromMeta,
   extentOutlineGeoJSON,
   formatExtent,
@@ -104,5 +106,22 @@ describe('extent outline and bounds', () => {
         ]).toEqual([w, s, e, n])
       }),
     )
+  })
+})
+
+describe('fitExtentFor', () => {
+  const region = DEFAULT_REGION_EXTENT
+  it('returns the region when there is no selection', () => {
+    expect(fitExtentFor(null, region)).toEqual(region)
+  })
+  it('returns the selection bounding box in west, south, east, north order', () => {
+    const box = { west: -121.2, south: 35.3, east: -118.9, north: 37.5 }
+    expect(fitExtentFor(bboxToGeometry(box), region)).toEqual(box)
+    expect(extentBounds(fitExtentFor(bboxToGeometry(box), region))[0]).toEqual([-121.2, 35.3])
+  })
+  it('widens a tiny selection to a valid extent', () => {
+    const tiny = { west: -120, south: 36, east: -120, north: 36 }
+    const out = fitExtentFor(bboxToGeometry(tiny), region)
+    expect(isValidExtent(out)).toBe(true)
   })
 })

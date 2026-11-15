@@ -105,3 +105,19 @@ describe('hotspot layer helpers', () => {
     expect(dens.kind).toBe('density')
   })
 })
+
+describe('density GeoJSON validity', () => {
+  it('gives every cell a non-empty colour and (lon, lat) corner order', () => {
+    const cells = [
+      { lat: 36.05, lon: -119.95, count: 1, raw_modis: 1, raw_viirs: 0 },
+      { lat: 36.15, lon: -119.85, count: 600, raw_modis: 300, raw_viirs: 300 },
+    ]
+    const data = cellsGeoJSON(cells, 0.1, densityClasses(cells))
+    for (const f of data.features) {
+      expect(f.properties.colour).not.toBe('')
+      const [lon = 0, lat = 0] = f.geometry.coordinates[0]?.[0] ?? []
+      expect(lon).toBeLessThan(-100)
+      expect(lat).toBeGreaterThan(30)
+    }
+  })
+})
