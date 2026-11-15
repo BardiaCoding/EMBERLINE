@@ -1,0 +1,24 @@
+# Delivered data (never commit)
+outputs2.0/
+Raw_Files/
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.hypothesis/
+.ruff_cache/
+*.egg-info/
+
+# Front end
+node_modules/
+web/dist/
+
+# OS / editor
+.DS_Store

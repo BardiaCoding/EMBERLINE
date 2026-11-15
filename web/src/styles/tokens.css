@@ -1,0 +1,110 @@
+/*
+ * Design tokens (shadcn convention). This file and src/styles/palettes.ts are the only
+ * places where raw colour values may be written (ESLint rule, design.md section 11.8).
+ * Colours are mapped to Tailwind utilities in index.css. Spacing is a 4 px scale.
+ * Light is the default set. The dark set applies with the `.dark` class, or with the OS
+ * preference when no theme class is set. Contrast of every pair is checked by task 19.8.
+ * The dimmed tokens (task 19.25) are used by `[data-updating='true']` below. Watch tokens (task 26.5) are added by that task.
+ */
+:root {
+  color-scheme: light;
+
+  /* Spacing: 4 px base, multiples via --space-N (N x 4 px). */
+  --space-unit: 4px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Layout (design.md section 11.1). */
+  --control-panel-width: 320px;
+  --results-panel-width: 560px;
+
+  --radius: 0.5rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.145 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.145 0 0);
+  --primary: oklch(0.205 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.97 0 0);
+  --secondary-foreground: oklch(0.205 0 0);
+  --muted: oklch(0.97 0 0);
+  --muted-foreground: oklch(0.44 0 0);
+  --accent: oklch(0.97 0 0);
+  --accent-foreground: oklch(0.205 0 0);
+  --destructive: oklch(0.5 0.2 27);
+  --border: oklch(0.85 0 0);
+  /* Control boundary: at least 3:1 on background and card (WCAG 1.4.11). */
+  --input: oklch(0.65 0 0);
+  --ring: oklch(0.45 0.15 255);
+  /* Dimmed text while old results are held (Req 28.7). At least 4.5:1 on background, card and muted. */
+  --foreground-dim: oklch(0.4 0 0);
+  --muted-foreground-dim: oklch(0.5 0 0);
+}
+:root.dark {
+  color-scheme: dark;
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.75 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.7 0.19 22);
+  --border: oklch(0.4 0 0);
+  --input: oklch(0.55 0 0);
+  --ring: oklch(0.7 0.13 255);
+  --foreground-dim: oklch(0.8 0 0);
+  --muted-foreground-dim: oklch(0.65 0 0);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not(.light):not(.dark) {
+    color-scheme: dark;
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.922 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.75 0 0);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.7 0.19 22);
+    --border: oklch(0.4 0 0);
+    --input: oklch(0.55 0 0);
+    --ring: oklch(0.7 0.13 255);
+    --foreground-dim: oklch(0.8 0 0);
+    --muted-foreground-dim: oklch(0.65 0 0);
+  }
+}
+
+/*
+ * Updating state (Req 28.7): old results are dimmed through these scoped token overrides,
+ * never `opacity`, so text keeps at least 4.5:1 contrast. The solid label sets its own colours.
+ */
+[data-updating='true'] {
+  --foreground: var(--foreground-dim);
+  --card-foreground: var(--foreground-dim);
+  --muted-foreground: var(--muted-foreground-dim);
+  color: var(--foreground-dim);
+}

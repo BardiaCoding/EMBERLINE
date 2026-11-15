@@ -1,0 +1,8 @@
+{
+  "harmonized_count": "The number of cell-days with at least one detected fire in the month, on the MODIS-equivalent scale, so MODIS-era and VIIRS-era months can be compared.",
+  "uncertainty_interval": "The range in which the harmonized count most likely lies, given the calibration error of the VIIRS-to-MODIS mapping.",
+  "baseline_median": "The middle value of the harmonized counts for this calendar month across all complete years in the baseline period, where half the years were lower and half higher.",
+  "anomaly": "How far the month's harmonized count is from the baseline median for the same calendar month, shown as a difference and as a percentage.",
+  "z_score": "The number of standard deviations by which the month's harmonized count lies above or below the baseline mean for the same calendar month.",
+  "percentile_rank": "The share of baseline years whose harmonized count for this calendar month was at or below the selected month's count."
+}

@@ -1,0 +1,33 @@
+# Secrets
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+
+# Delivered data: never in the image (mounted or downloaded at start)
+outputs2.0/
+Raw_Files/
+**/*.parquet
+
+# VCS and local tooling
+.git
+.gitignore
+.kiro
+.venv
+**/__pycache__
+**/*.pyc
+.pytest_cache
+.hypothesis
+.ruff_cache
+.DS_Store
+
+# Front-end dependencies and output (rebuilt in the image)
+**/node_modules
+web/dist
+
+# Not needed at runtime
+tests/
+Makefile
+Dockerfile
+.dockerignore

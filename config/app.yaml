@@ -1,0 +1,70 @@
+# App configuration for the Harmonized Fire Calendar. Read by hotspots.config.load_config.
+# Select another file with the HOTSPOTS_CONFIG environment variable.
+
+region:
+  name: "California region"
+  # Measured extent of the delivered data (EPSG:4326, degrees). DEFAULT (confirm):
+  # the data addendum said north 42.3 and east -113.9, one 0.1 degree cell larger.
+  extent: {west: -124.4, south: 32.5, east: -114.0, north: 42.2}
+
+# Folder holding harmonized_monthly_grid.parquet and detections_harmonized.parquet.
+# A relative path is resolved against the working directory. The folder is gitignored.
+data_dir: outputs2.0
+
+# First month of the record. Months before it never enter the Calendar or any baseline.
+record_start: "2000-11"
+
+# cell_id values dropped from every query (stray cell outside California).
+excluded_cells: ["38.7000_-117.4000"]
+
+# Baseline period: full record from record_start, incomplete months excluded.
+# DEFAULT (confirm)
+baseline:
+  start: "record_start"
+  exclude_incomplete: true
+
+# Watch level: "Above normal" when the percentile rank is above this value (0 to 100).
+# DEFAULT (confirm)
+watch_threshold: 90
+
+# Average bytes per CSV data row, used for the download size estimate.
+# Measured once with scripts/measure_csv_row_bytes.py: all 2,105,593 rows of
+# detections_harmonized.parquet through the exporter's row formatter, UTF-8 bytes including the
+# line break (206,311,313 bytes in total, mean 97.98). DEFAULT (confirm): rounded to 98.
+# 0 means not measured; the estimate then uses a built-in fallback of 98.
+csv_avg_bytes_per_row: 98
+
+# One-click example areas (Requirement 1.11). Each is a GeoJSON Polygon in EPSG:4326 with
+# [longitude, latitude] positions, closed by repeating the first position.
+# DEFAULT (confirm): the polygons are approximate hand-drawn outlines, and the descriptions
+# are qualitative and unverified. No fire statistics are claimed. Check them against the
+# delivered data before publication.
+example_areas:
+  # DEFAULT (confirm), unverified
+  - name: "Central Valley farmland"
+    description: "Flat irrigated farmland. Burning here is expected to be mostly agricultural and other managed fires."
+    geometry:
+      type: Polygon
+      coordinates:
+        - [[-120.0, 35.3], [-118.9, 35.3], [-119.4, 36.3], [-120.3, 37.5], [-121.2, 37.5], [-120.4, 36.3], [-120.0, 35.3]]
+  # DEFAULT (confirm), unverified
+  - name: "Sierra Nevada forest"
+    description: "Forested mountain range. Burning here is expected to be mostly wildfire, mainly in summer and autumn."
+    geometry:
+      type: Polygon
+      coordinates:
+        - [[-121.0, 39.6], [-120.0, 39.6], [-118.3, 36.2], [-119.2, 36.2], [-121.0, 39.6]]
+  # DEFAULT (confirm), unverified
+  - name: "Southern California chaparral"
+    description: "Shrubland and foothills beside large cities. Burning here is expected to be mostly wildfire, often during autumn wind events."
+    geometry:
+      type: Polygon
+      coordinates:
+        - [[-118.9, 33.9], [-117.0, 33.7], [-116.8, 34.3], [-118.7, 34.5], [-118.9, 33.9]]
+  # DEFAULT (confirm), unverified
+  - name: "North Coast and Klamath"
+    description: "Forested coastal and inland mountains. Burning here is expected to be mostly wildfire in summer, with a cooler, wetter coast."
+    geometry:
+      type: Polygon
+      coordinates:
+        - [[-124.1, 39.0], [-122.6, 39.0], [-122.6, 41.9], [-124.1, 41.9], [-124.1, 39.0]]

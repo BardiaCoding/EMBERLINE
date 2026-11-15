@@ -1,0 +1,114 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import './tokens.css';
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  /* Tailwind's spacing unit follows the 4 px scale of tokens.css. */
+  --spacing: var(--space-unit);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background font-sans text-foreground tabular-nums antialiased;
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+/*
+ * App shell layout (design.md section 11.1). Written as plain CSS because the three
+ * breakpoints reassign grid areas:
+ *   below 768 px:   one column (controls, map, results), the page scrolls.
+ *   768 to 1279 px: controls above the map on the left, results on the right.
+ *   1280 px and up: 320 px controls, map, 560 px results. Panels scroll on their own.
+ */
+@layer components {
+  .app-shell {
+    display: flex;
+    min-height: 100dvh;
+    flex-direction: column;
+  }
+  .app-body {
+    display: grid;
+    flex: 1;
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: 'controls' 'map' 'results';
+  }
+  .app-panel {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  /* Wide tables, charts and the map scroll inside their own box, never the page (Req 26.6, 27.6). */
+  .app-shell {
+    max-width: 100%;
+    overflow-x: clip;
+  }
+  .app-panel :where(table, pre) {
+    max-width: 100%;
+  }
+  .app-panel-controls {
+    grid-area: controls;
+  }
+  .app-panel-map {
+    grid-area: map;
+    min-height: 20rem;
+  }
+  .app-panel-results {
+    grid-area: results;
+  }
+  @media (min-width: 768px) {
+    .app-shell {
+      height: 100dvh;
+    }
+    .app-body {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+      grid-template-areas: 'controls results' 'map results';
+    }
+    .app-panel-controls,
+    .app-panel-results {
+      overflow-y: auto;
+    }
+    .app-panel-map {
+      min-height: 0;
+    }
+  }
+  @media (min-width: 1280px) {
+    .app-body {
+      grid-template-columns: var(--control-panel-width) minmax(0, 1fr) var(--results-panel-width);
+      grid-template-rows: minmax(0, 1fr);
+      grid-template-areas: 'controls map results';
+    }
+  }
+}
