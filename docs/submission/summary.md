@@ -20,6 +20,7 @@ download CSV files.
 ## Long version
 
 ### Problem
+
 Satellites have tracked active-fire hotspots for more than two decades. The record is split
 between MODIS (on Terra and Aqua, near the end of its operational life) and VIIRS (its
 replacement). The sensors differ in spatial resolution, sensitivity and overpass schedule, so
@@ -28,16 +29,17 @@ where burning happened. Burning activity here means any fire a satellite can det
 and human-caused fires such as agricultural burning and land clearing.
 
 ### Solution
+
 A web application with a harmonized burning activity calendar for the **California region**,
 November 2000 to the present. The data come from NASA Earthdata FIRMS (MODIS and VIIRS active
 fire data).
 
-- **Harmonization (done before this app, documented in the methodology).** The unit is the
-  cell-day: one 1 km cell with at least one kept detection on a local day, counted once per
-  sensor family. VIIRS counts are mapped to a MODIS-equivalent scale with a transfer function
+- **Harmonization (done before this app, documented in the methodology).** Three layers. Layer 1:
+  the unit is the cell-day, one 1 km cell with at least one kept detection on a local day,
+  counted once per sensor family. Layer 2: VIIRS counts are mapped to a MODIS-equivalent scale with a transfer function
   fitted on the 2012 onward overlap, separately for each 1.0 degree region. Quantile mapping was
-  chosen (statewide holdout RMSE 22.2, bias 0.8, seasonality correlation 0.989; DR). MODIS counts
-  are used before 2012 and calibrated VIIRS counts from 2012. After this step, the sensor of
+  chosen (statewide holdout RMSE 22.2, bias 0.8, seasonality correlation 0.989; DR). Layer 3:
+  MODIS counts are used before 2012 and calibrated VIIRS counts from 2012. After this step, the sensor of
   origin no longer matters for the monthly counts.
 - **The app.** The user selects an area by drawing on a map, entering coordinates, or picking an
   example area, and chooses a date range. The app shows:
@@ -54,12 +56,14 @@ fire data).
   - a methods page.
 
 ### Target users
+
 - Early warning and emergency responders
 - Scientists
 - Land managers
 - Firefighters
 
 ### Benefits
+
 - Answers three questions in one place: which periods of the year have more fires, which years
   had more burning, and how current activity compares with the historical median.
 - One consistent scale across the sensor change, so a trend is not an artefact of switching
@@ -71,6 +75,7 @@ fire data).
 - Plain-language help, accessible colours, and a layout that works on narrow screens.
 
 ### Tools
+
 Only items listed in `pyproject.toml` and `web/package.json`.
 
 - **Data and API (Python 3.12):** DuckDB (reads the delivered Parquet files), FastAPI, uvicorn,
@@ -88,7 +93,9 @@ Only items listed in `pyproject.toml` and `web/package.json`.
   (DC).
 
 ### What is built and what is deferred
+
 Built:
+
 - Calendar, area selection (draw, coordinates, circle, GeoJSON upload, example areas), date
   range, custom baseline period, key figures, charts, season tracker, monthly watch badge,
   recent view, hotspot map layer, CSV and analytics downloads, chart export, share links, methods
@@ -101,6 +108,7 @@ Built:
   months that have no activity counted as zero.
 
 Deferred, because the data do not support them:
+
 - **Uncertainty intervals.** The `lower_bound` and `upper_bound` fields exist and are empty. The
   calibration holdout-error file was not delivered, so no interval is shown.
 - **Daily harmonized series.** The harmonized grid is monthly only. Daily values exist only as
@@ -109,7 +117,9 @@ Deferred, because the data do not support them:
 - Per-query filter counts and a filtered-sources layer.
 
 ### Known limitations (in brief)
+
 Full list: README and methodology.
+
 - The calibration assumes the 2012 onward overlap represents the earlier period (DR).
 - Terra and Aqua overpass drift and VIIRS constellation changes may leave residual effects (DR).
 - Small fires before 2012 are undercounted compared with the VIIRS era (DR).
@@ -126,6 +136,7 @@ Full list: README and methodology.
   boundary.
 
 ### How to try it
+
 - **Deployed app:** `<deployed URL: add after deployment>` (DEFAULT (confirm); not yet verified).
 - Open it, pick an example area or draw a rectangle or polygon on the map, then read the
   Calendar. Select a cell for details, open the Trends and Season tabs, and use Downloads for

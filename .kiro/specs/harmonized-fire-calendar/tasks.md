@@ -737,6 +737,11 @@ Conventions for every task:
     - Add the missing `PRODUCT_SHORT_NAME` import in App.test.tsx, AppShell.test.tsx and a11y.views.test.tsx; typecheck, lint and the build must pass
     - _Requirements: 33.1_
 
+- [x] 37. Document the harmonization stack
+  - [x] 37.1 Update the methodology docs with the three-layer harmonization description
+    - `docs/methodology.md` (renderer-compatible: no tables, no Mermaid), short pointers in `README.md` and `docs/submission/summary.md` only where they describe harmonization; no pipeline code added
+    - _Requirements: 26.8, 33.5_
+
 ### Stage 4: P2 features (all optional, only if time remains)
 
 - [ ] 30. P2 differentiators

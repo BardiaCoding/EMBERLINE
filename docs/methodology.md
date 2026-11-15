@@ -37,11 +37,51 @@ The delivered data are already filtered, and the app does not filter again.
 
 ## From VIIRS to the MODIS-equivalent scale
 
-The reference scale is MODIS-equivalent. Counts before 2012 are MODIS-native. From 2012 onward the VIIRS counts are mapped to the MODIS scale with a transfer function fitted on the months where both sensors operated (the 2012 and later overlap). The function is fitted separately for each 1.0 degree calibration region, never as one global factor. The switchover year is 2012.
+### The problem
 
-Three candidate models were compared on a held-out 25% of the overlap months: a monthly ratio, a quantile mapping and a log regression. Quantile mapping had the lowest error and is the model chosen statewide. Within each region the model with the lowest error is used, and a fallback fitted on all regions together is used in 13 data-poor regions that have fewer than 24 overlap months. The held-out months are picked by a stable hash of region, year and month, so the pipeline is deterministic.
+MODIS (Terra and Aqua) has 1 km pixels, gives fewer detections per fire, has had two satellites since 2002 and is less sensitive. VIIRS (Suomi NPP, NOAA-20, NOAA-21) has 375 m pixels (about 7 times finer in area), gives many more detections per fire, grew from one to two satellites in 2018 and to three in 2023, and is more sensitive to smaller, cooler fires. Raw counts would show false step-ups when VIIRS appears (2012) and when each new VIIRS satellite joins (2018, 2023). The pipeline removes them in three layers. The reference scale is MODIS-equivalent. The layers below follow the data owner's description of the pipeline.
 
-Every monthly value in the calendar carries a source flag (`native` or `calibrated`), the calibration model used (`quantile_map`, `ratio_month`, `log_regression` or `none`) and the satellites that contributed, so the origin of each number can be checked even though the scale is the same throughout.
+### Layer 1: cell-days
+
+Each detection is snapped to a cell of 0.01 degrees (about 1 km). Each unique pair of cell and local day is counted once per sensor family, with all satellites of the family merged. Terra and Aqua on the same day give one MODIS cell-day. Suomi NPP, NOAA-20 and NOAA-21 on the same day give one VIIRS cell-day. The cell-days are then summed into monthly counts per 0.1 degree display cell. A raw-count version is kept by the owner for quality checks. This layer neutralizes the pixel-size difference and the growing VIIRS constellation.
+
+Evidence from the data owner, statewide VIIRS, for 2018 when NOAA-20 was added:
+
+- Raw VIIRS detections rose from 79,274 in 2017 to 171,230 in 2018 (+116%). This is an artifact of the added satellite.
+- VIIRS cell-days rose from 28,429 to 37,889 (+33%). This is a real fire year.
+
+Check against the delivered files: the detection counts per local year (79,274 and 171,230) and the 2017 cell-day count (28,429) were reproduced from `detections_harmonized.parquet`. For 2018 the same query gave 37,887 cell-days, 2 fewer than the owner's 37,889. The small difference probably comes from how the 0.01 degree snapping is done, which the owner has not described, so treat 37,889 as the owner's figure.
+
+### Layer 2: calibration onto the MODIS scale
+
+A gap remains after Layer 1, because VIIRS still resolves more distinct 1 km cells. The overlap from 2012 onward is used to fit a transfer function from VIIRS monthly cell-days to the MODIS-equivalent scale. The function is fitted separately for each 1.0 degree calibration region, never as one global factor, because the relationship differs by fire regime.
+
+Three candidate models were compared on a deterministic held-out 25% of the overlap months:
+
+- Ratio per month.
+- Quantile mapping. It had about 4 times lower RMSE than the other two, a bias near zero and the best seasonality, so it is the model chosen statewide.
+- Log regression, an ordinary least squares fit of log1p(MODIS) on log1p(VIIRS).
+
+Within each region the model with the lowest RMSE is used. The data README states a statewide fallback, fitted on all regions together, for 13 data-poor regions with fewer than 24 overlap months. The data owner adds that 85 of 98 regions are therefore fitted individually. The delivered README does not state the 85, but it follows from 98 regions minus 13 fallback regions. The held-out months are picked by a stable hash of region, year and month, so the pipeline is deterministic. For every model, zero VIIRS gives zero harmonized, never a negative value.
+
+The 96 regions with validation metrics (below) and the 13 fallback regions are separate counts. The delivered files do not say how they overlap, so how many fallback regions are among the 96 is unverified.
+
+### Layer 3: stitching
+
+Before 2012 the series uses the MODIS-native cell-day counts (source flag `native`). From 2012 onward it uses the calibrated VIIRS counts on the MODIS-equivalent scale (source flag `calibrated`). Each monthly value in the calendar carries the source flag, the calibration model used (`quantile_map`, `ratio_month`, `log_regression` or `none`), the satellites that contributed (`provenance`) and an incomplete flag for the latest partial month. The origin of each number can therefore be checked even though the scale is the same throughout.
+
+### Pipeline settings
+
+These are the data owner's pipeline settings. They are not configurable in this app.
+
+- `REFERENCE_SCALE`: MODIS.
+- `SWITCHOVER_YEAR`: 2012.
+- `DEDUP_CELL_DEG`: 0.01 (Layer 1 cell size).
+- `DISPLAY_GRID_DEG`: 0.1 (display cell size).
+- `REGION_GRID_DEG`: 1.0 (calibration region size).
+- `CALIBRATION_CANDIDATES`: ratio, quantile, log.
+
+The pipeline code, its `reports/` folder and its plots are not part of this repository. This app only reads the delivered files.
 
 ### Validation numbers
 
@@ -53,6 +93,7 @@ These numbers are copied from the data README. They are statewide results on the
 - Per-region metrics exist for 96 of 98 regions.
 - The mean harmonized count was 383.7 for 2009 to 2011 and 366.3 for 2012 to 2014, a change of -4.5%, so the harmonized line shows no step at the 2012 switchover.
 - The README reports that the raw VIIRS rise at 2018 and 2023 (more satellites) is removed by the harmonization, and that anomalies show no regime break across the switchover. The README gives plots for these, not numbers.
+- The data owner also reports that megafire extremes (2020, 2021) are preserved, that monthly anomalies are stable across the seam, and that 13 of 13 internal-correctness checks pass (`reports/output_verification.csv`). These claims come from the owner and were not reproduced here, because the reports are not delivered.
 
 The README places the per-region metrics in `reports/phase2d_region_metrics.csv`. That file was not delivered with the data, so the per-region values are not reproduced here.
 
@@ -110,6 +151,9 @@ The watch level is an indicator of how unusual a month was in the harmonized rec
 
 - DEFAULT (confirm): the measured grid extent given above replaces the larger extent in the data addendum until the data owner confirms.
 - Unverified: whether a state boundary mask was applied to the data.
+- Unverified: the share of the 13 statewide-fallback regions that are among the 96 regions with validation metrics.
+- Unverified: the owner's statement that 85 of 98 regions are fitted individually (derived from 98 minus 13, not stated in the delivered README).
+- Unverified: the 2018 cell-day count of 37,889. The delivered files give 37,887 with a simple 0.01 degree snap.
 - Unverified: the start date of Aqua coverage and the launch dates of the satellites. They are not in the delivered documents. Check the NASA FIRMS documentation before quoting them.
 - Unverified: the descriptions of the example areas in the app are qualitative and make no claim about fire statistics.
 - DEFAULT (confirm): the watch threshold of 90.

@@ -97,7 +97,9 @@ Put the delivered files in `outputs2.0/` at the repository root:
 
 The folder is set by `data_dir` in `config/app.yaml`. Method and validation numbers are in
 `outputs2.0/DATA_README.md`. The data pipeline (acquisition, filtering, calibration,
-harmonization, validation) was run outside this repository.
+harmonization, validation) was run outside this repository. Its code, `reports/` folder and plots
+are not part of this repository. The method has three layers: cell-days, per-region calibration
+of VIIRS to a MODIS-equivalent scale, and stitching at 2012 (see `docs/methodology.md`).
 
 Check that the files match the data contract (columns, types, row counts, extent):
 
@@ -178,14 +180,14 @@ endpoint `/api/health` then answers 503.
 
 ### Configuration
 
-| Variable | Used for |
-|---|---|
-| `HOTSPOTS_CONFIG` | Path of the YAML config file (default `config/app.yaml`; `/app/config/app.yaml` in the image). |
-| `HOTSPOTS_STATIC_DIR` | Folder with the built front end (`/app/static` in the image). |
-| `PORT` | Port the server listens on (default `7860`). |
-| `HF_DATASET_REPO` | Hugging Face dataset repo that holds the two Parquet files. |
-| `HF_TOKEN` | Token for that repo. Set it as a Space secret or in an untracked `.env`. Never commit it. |
-| `HOTSPOTS_SHARE_DB` | Optional SQLite file for short share links. Without it, long areas are simplified. |
+| Variable              | Used for                                                                                       |
+| --------------------- | ---------------------------------------------------------------------------------------------- |
+| `HOTSPOTS_CONFIG`     | Path of the YAML config file (default `config/app.yaml`; `/app/config/app.yaml` in the image). |
+| `HOTSPOTS_STATIC_DIR` | Folder with the built front end (`/app/static` in the image).                                  |
+| `PORT`                | Port the server listens on (default `7860`).                                                   |
+| `HF_DATASET_REPO`     | Hugging Face dataset repo that holds the two Parquet files.                                    |
+| `HF_TOKEN`            | Token for that repo. Set it as a Space secret or in an untracked `.env`. Never commit it.      |
+| `HOTSPOTS_SHARE_DB`   | Optional SQLite file for short share links. Without it, long areas are simplified.             |
 
 Copy `.env.example` to `.env` for local use. The image never contains `.env` or any secret.
 
