@@ -733,6 +733,9 @@ Conventions for every task:
   - [x] 36.1 Apply the product name Emberline
     - Header (`PRODUCT_NAME`), page title, README title and Space title, API title, docs under `docs/submission/`; keep "California region" and all data wording unchanged
     - _Requirements: 33.1_
+  - [x] 36.2 Fix the web build after the rename
+    - Add the missing `PRODUCT_SHORT_NAME` import in App.test.tsx, AppShell.test.tsx and a11y.views.test.tsx; typecheck, lint and the build must pass
+    - _Requirements: 33.1_
 
 ### Stage 4: P2 features (all optional, only if time remains)
 

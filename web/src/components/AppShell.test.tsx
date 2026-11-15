@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import path from 'node:path'
 import { render, screen, within } from '@testing-library/react'
 import { axe } from 'vitest-axe'
-import { AppShell } from './AppShell'
+import { AppShell, PRODUCT_SHORT_NAME } from './AppShell'
 
 describe('AppShell', () => {
   it('shows the product name, the region label and the data badge', () => {
